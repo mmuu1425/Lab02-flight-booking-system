@@ -1,0 +1,54 @@
+{
+  "tests": [
+    {
+      "name": "Health Check Endpoints - Variant 1",
+      "setup": "docker-compose up -d && sleep 30",
+      "run": "./health-check.sh",
+      "input": "",
+      "output": "All services are healthy",
+      "comparison": "included",
+      "timeout": 60,
+      "points": 20
+    },
+    {
+      "name": "Unit Tests - User Service",
+      "setup": "cd user-service",
+      "run": "mvn test -Dtest=UserApplicationTest",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Unit Tests - Flight Service",
+      "setup": "cd flight-service",
+      "run": "mvn test -Dtest=FlightApplicationTest",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Unit Tests - Booking Service",
+      "setup": "cd booking-service",
+      "run": "mvn test -Dtest=BookingApplicationTest",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Unit Tests - Gateway Service",
+      "setup": "cd gateway",
+      "run": "mvn test -Dtest=GatewayApplicationTest",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    }
+  ]
+}

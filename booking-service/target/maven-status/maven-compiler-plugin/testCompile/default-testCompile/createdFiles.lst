@@ -1,0 +1,4 @@
+com\flight\booking\repository\BookingRepositoryTest.class
+com\flight\booking\service\BookingServiceTest.class
+com\flight\booking\BookingApplicationTest.class
+com\flight\booking\controller\BookingControllerTest.class
