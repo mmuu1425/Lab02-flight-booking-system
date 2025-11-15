@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      discovery:
+        enabled: false
+
+# 健康检查配置 - 禁用 actuator 的健康端点，使用自定义
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,metrics  # 不包含 health
+      base-path: /manage
+  endpoint:
+    health:
+      enabled: false  # 关键：禁用 actuator 的健康端点
+
+# 日志配置：
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.flight.gateway: INFO

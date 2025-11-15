@@ -1,0 +1,85 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: program
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: program
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-database:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U program -d program"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "8050:8050"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user_db
+      SPRING_DATASOURCE_USERNAME: program
+      SPRING_DATASOURCE_PASSWORD: test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8050/manage/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  flight-service:
+    build: ./flight-service
+    ports:
+      - "8060:8060"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flight_db
+      SPRING_DATASOURCE_USERNAME: program
+      SPRING_DATASOURCE_PASSWORD: test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8060/manage/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  booking-service:
+    build: ./booking-service
+    ports:
+      - "8070:8070"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/booking_db
+      SPRING_DATASOURCE_USERNAME: program
+      SPRING_DATASOURCE_PASSWORD: test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8070/manage/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gateway:
+    build: ./gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      user-service:
+        condition: service_healthy
+      flight-service:
+        condition: service_healthy
+      booking-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/manage/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
