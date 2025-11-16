@@ -53,8 +53,12 @@ public class BookingCoordinatorService {
 
     // 调用用户服务获取用户信息
     private Mono<String> getUserByUsername(String username) {
+        String userServiceHost = System.getenv("USER_SERVICE_HOST");
+        if (userServiceHost == null) {
+            userServiceHost = "localhost";  // 本地开发默认值
+        }
         return webClient.get()
-                .uri("http://localhost:8050/api/users/username/{username}", username)
+                .uri("http://" + userServiceHost + ":8050/api/users/username/{username}", username)
                 .retrieve()
                 .bodyToMono(String.class)
                 .onErrorMap(WebClientResponseException.class,
@@ -63,8 +67,12 @@ public class BookingCoordinatorService {
 
     // 调用航班服务获取航班信息
     private Mono<String> getFlightByNumber(String flightNumber) {
+        String flightServiceHost = System.getenv("FLIGHT_SERVICE_HOST");
+        if (flightServiceHost == null) {
+            flightServiceHost = "localhost";  // 本地开发默认值
+        }
         return webClient.get()
-                .uri("http://localhost:8060/api/flights/number/{flightNumber}", flightNumber)
+                .uri("http://" + flightServiceHost + ":8060/api/flights/number/{flightNumber}", flightNumber)
                 .retrieve()
                 .bodyToMono(String.class)
                 .onErrorMap(WebClientResponseException.class,
@@ -73,12 +81,17 @@ public class BookingCoordinatorService {
 
     // 调用预订服务创建预订
     private Mono<String> createBooking(UUID userUid, UUID flightUid) {
+        String bookingServiceHost = System.getenv("BOOKING_SERVICE_HOST");
+        if (bookingServiceHost == null) {
+            bookingServiceHost = "localhost";  // 本地开发默认值
+        }
+
         String bookingJson = String.format(
                 "{\"userUid\": \"%s\", \"flightUid\": \"%s\", \"status\": \"CONFIRMED\"}",
                 userUid, flightUid);
 
         return webClient.post()
-                .uri("http://localhost:8070/api/bookings")
+                .uri("http://" + bookingServiceHost + ":8070/api/bookings")
                 .header("Content-Type", "application/json")
                 .bodyValue(bookingJson)
                 .retrieve()

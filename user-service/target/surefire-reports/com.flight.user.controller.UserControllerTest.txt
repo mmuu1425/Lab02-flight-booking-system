@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.flight.user.controller.UserControllerTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.723 s - in com.flight.user.controller.UserControllerTest

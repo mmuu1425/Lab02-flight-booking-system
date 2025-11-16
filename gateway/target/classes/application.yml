@@ -10,19 +10,20 @@ spring:
     gateway:
       discovery:
         enabled: false
+  # 删除 routes 配置
 
-# 健康检查配置 - 禁用 actuator 的健康端点，使用自定义
+# 启用健康检查端点
 management:
   endpoints:
     web:
       exposure:
-        include: info,metrics  # 不包含 health
+        include: health,info,metrics
       base-path: /manage
   endpoint:
     health:
-      enabled: false  # 关键：禁用 actuator 的健康端点
+      enabled: true
+      show-details: always
 
-# 日志配置：
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG

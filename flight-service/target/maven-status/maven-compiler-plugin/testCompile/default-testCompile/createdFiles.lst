@@ -1,0 +1,4 @@
+com\flight\flight\service\FlightServiceTest.class
+com\flight\flight\controller\FlightControllerTest.class
+com\flight\flight\FlightApplicationTest.class
+com\flight\flight\repository\FlightRepositoryTest.class

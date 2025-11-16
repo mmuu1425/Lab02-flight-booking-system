@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.flight.flight.FlightApplicationTest
+-------------------------------------------------------------------------------
+Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.797 s - in com.flight.flight.FlightApplicationTest
