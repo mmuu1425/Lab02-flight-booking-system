@@ -1,29 +1,10 @@
-name: Java CI with Maven
+name: GitHub Classroom Workflow
 
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: program
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: program
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
       - uses: actions/checkout@v3
@@ -35,52 +16,36 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # 添加 Docker Compose 安装
       - name: Install Docker Compose
         run: |
           sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
 
-      - name: Build and test user-service
+      # 先运行测试
+      - name: Run all unit tests
         run: |
-          cd user-service
-          mvn -B clean compile test -DskipTests=false
+          mvn -B clean test
 
-      - name: Build and test flight-service
+      # 构建 JAR 文件
+      - name: Build JAR packages
         run: |
-          cd flight-service
-          mvn -B clean compile test -DskipTests=false
+          mvn -B clean package -DskipTests
 
-      - name: Build and test booking-service
-        run: |
-          cd booking-service
-          mvn -B clean compile test -DskipTests=false
-
-      - name: Build and test gateway
-        run: |
-          cd gateway
-          mvn -B clean compile test -DskipTests=false
-
+      # 构建 Docker 镜像
       - name: Build Docker images
         run: |
           docker-compose build
 
-      - name: Start services and check health
+      - name: Start services
         run: |
           docker-compose up -d
-          echo "Waiting for services to be ready..."
-          sleep 30
-          curl -f http://localhost:8080/manage/health || exit 1
-          curl -f http://localhost:8050/manage/health || exit 1
-          curl -f http://localhost:8060/manage/health || exit 1
-          curl -f http://localhost:8070/manage/health || exit 1
-          echo "All health checks passed!"
 
-      - name: Test service coordination
+      # 健康检查
+      - name: Wait for services health
         run: |
-          echo "Testing service coordination..."
-          curl -X POST http://localhost:8080/api/bookings/complete \
-            -H "Content-Type: application/json" \
-            -d '{"username": "testuser", "flightNumber": "TEST123"}' \
-            -w "\nHTTP Status: %{http_code}\n" || echo "Coordination test completed"
+          echo "Waiting for services to be healthy..."
+          timeout 120 bash -c 'until curl -f http://localhost:8080/manage/health >/dev/null 2>&1; do echo "Waiting for gateway..."; sleep 5; done'
+          timeout 120 bash -c 'until curl -f http://localhost:8050/manage/health >/dev/null 2>&1; do echo "Waiting for user-service..."; sleep 5; done'
+          timeout 120 bash -c 'until curl -f http://localhost:8060/manage/health >/dev/null 2>&1; do echo "Waiting for flight-service..."; sleep 5; done'
+          timeout 120 bash -c 'until curl -f http://localhost:8070/manage/health >/dev/null 2>&1; do echo "Waiting for booking-service..."; sleep 5; done'
+          echo "All services are healthy!"
