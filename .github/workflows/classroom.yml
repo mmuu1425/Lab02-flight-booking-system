@@ -41,8 +41,8 @@ jobs:
         timeout-minutes: 5
         run: |
           docker compose up -d
-          chmod +x wait-script.sh  # 先添加执行权限
-          ./wait-script.sh  # 改为根目录的脚本
+          chmod +x wait-script.sh wait-for.sh
+          ./wait-script.sh
         env:
           WAIT_PORTS: 8080,8070,8060,8050
 
