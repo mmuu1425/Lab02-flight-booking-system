@@ -1,10 +1,8 @@
 package com.example.flightservice.controller;
 
+import com.example.flightservice.dto.FlightPaginationResponse;
 import com.example.flightservice.entity.Flight;
-import com.example.flightservice.repository.FlightRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import com.example.flightservice.service.FlightService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,33 +12,44 @@ import java.util.Optional;
 @RequestMapping("/api/v1")
 public class FlightController {
 
-    private final FlightRepository flightRepository;
+    private final FlightService flightService;
 
-    public FlightController(FlightRepository flightRepository) {
-        this.flightRepository = flightRepository;
+    public FlightController(FlightService flightService) {
+        this.flightService = flightService;
     }
 
-    // 统一的健康检查（根路径）
-    @GetMapping("/flights/manage/health")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("OK");
-    }
-
-    // 航班API（有路径前缀）
+    // 使用Service层获取航班列表
     @GetMapping("/flights")
-    public ResponseEntity<Page<Flight>> getFlights(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<FlightPaginationResponse> getFlights(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Flight> flights = flightRepository.findAll(pageable);
-        return ResponseEntity.ok(flights);
+        System.out.println("=== [DEBUG] Flight Controller被调用 ===");
+        System.out.println("=== [DEBUG] page: " + page + ", size: " + size + " ===");
+
+        try {
+            FlightPaginationResponse response = flightService.getFlights(page, size);
+
+            System.out.println("=== [DEBUG] 返回数据: " + response.getItems().size() + " 个航班 ===");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("=== [DEBUG] 发生异常: " + e.getMessage() + " ===");
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 
+    // 使用Service层获取特定航班
     @GetMapping("/flights/{flightNumber}")
     public ResponseEntity<Flight> getFlightByNumber(@PathVariable String flightNumber) {
-        Optional<Flight> flight = flightRepository.findByFlightNumber(flightNumber);
+        Optional<Flight> flight = flightService.getFlightByNumber(flightNumber);
         return flight.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // 健康检查
+    @GetMapping("/manage/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("OK");
     }
 }

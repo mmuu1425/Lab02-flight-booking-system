@@ -5,13 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Repository
-public interface PrivilegeHistoryRepository extends JpaRepository<PrivilegeHistory, Integer> {
-    // 错误：findByPrivilegeUsernameOrderByDatetimeDesc
-    // 正确：findByPrivilege_UsernameOrderByDatetimeDesc
-    List<PrivilegeHistory> findByPrivilege_UsernameOrderByDatetimeDesc(String username);
-
-    boolean existsByTicketUid(UUID ticketUid);
+public interface PrivilegeHistoryRepository extends JpaRepository<PrivilegeHistory, Integer> {  // 改为Integer
+    List<PrivilegeHistory> findByPrivilegeId(Integer privilegeId);  // 改为Integer
 }

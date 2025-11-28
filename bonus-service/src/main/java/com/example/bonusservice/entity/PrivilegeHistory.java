@@ -1,5 +1,6 @@
 package com.example.bonusservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -8,13 +9,13 @@ import java.util.UUID;
 @Table(name = "privilege_history")
 public class PrivilegeHistory {
 
+    @JsonIgnore  // 防止循环引用
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "privilege_id", nullable = false)
+    private Privilege privilege;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @ManyToOne
-    @JoinColumn(name = "privilege_id", nullable = false)
-    private Privilege privilege;
 
     @Column(name = "ticket_uid", nullable = false)
     private UUID ticketUid;

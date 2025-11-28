@@ -1,10 +1,17 @@
 package com.example.bonusservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "privilege")
 public class Privilege {
+
+    @JsonIgnore  // 防止循环引用
+    @OneToMany(mappedBy = "privilege", fetch = FetchType.LAZY)
+    private List<PrivilegeHistory> history;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

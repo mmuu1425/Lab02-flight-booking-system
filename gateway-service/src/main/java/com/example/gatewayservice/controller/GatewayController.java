@@ -1,71 +1,147 @@
 package com.example.gatewayservice.controller;
 
-import com.example.gatewayservice.dto.UserInfoResponse;
-import com.example.gatewayservice.service.FlightService;
+import com.example.gatewayservice.dto.*;
 import com.example.gatewayservice.service.GatewayService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1")
 public class GatewayController {
 
     private final GatewayService gatewayService;
-    private final FlightService flightService;
 
-    public GatewayController(GatewayService gatewayService, FlightService flightService) {
+    public GatewayController(GatewayService gatewayService) {
         this.gatewayService = gatewayService;
-        this.flightService = flightService;
     }
 
-    // 获取用户完整信息 - 修复：使请求头可选
+    // 获取用户完整信息
     @GetMapping("/me")
-    public ResponseEntity<UserInfoResponse> getUserInfo(
-            @RequestHeader(value = "X-User-Name", required = false) String username) {
+    public Mono<ResponseEntity<UserInfoResponse>> getUserInfo(
+            @RequestHeader("X-User-Name") String username) {
 
         if (username == null || username.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
+            return Mono.just(ResponseEntity.badRequest().build());
         }
 
         try {
             UserInfoResponse userInfo = gatewayService.getUserInfo(username);
-            return ResponseEntity.ok(userInfo);
+            return Mono.just(ResponseEntity.ok(userInfo));
         } catch (Exception e) {
-            return ResponseEntity.status(503).body(new UserInfoResponse());
+            return Mono.just(ResponseEntity.status(503).build());
         }
     }
 
-    // 获取航班列表 - 修复：明确指定参数名称
+    // 获取特权信息
+    @GetMapping("/privilege")
+    public Mono<ResponseEntity<PrivilegeResponse>> getPrivilege(
+            @RequestHeader("X-User-Name") String username) {
+
+        if (username == null || username.trim().isEmpty()) {
+            return Mono.just(ResponseEntity.badRequest().build());
+        }
+
+        try {
+            PrivilegeResponse privilege = gatewayService.getPrivilegeInfo(username);
+            return Mono.just(ResponseEntity.ok(privilege));
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(503).build());
+        }
+    }
+
+    // 获取用户所有票
+    @GetMapping("/tickets")
+    public Mono<ResponseEntity<?>> getUserTickets(
+            @RequestHeader("X-User-Name") String username) {
+
+        if (username == null || username.trim().isEmpty()) {
+            return Mono.just(ResponseEntity.badRequest().build());
+        }
+
+        try {
+            Object tickets = gatewayService.getUserTickets(username);
+            return Mono.just(ResponseEntity.ok(tickets));
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(503).build());
+        }
+    }
+
+    // 获取特定票 - 修复路径参数
+    @GetMapping("/tickets/{ticketUid}")
+    public Mono<ResponseEntity<?>> getTicket(
+            @PathVariable("ticketUid") String ticketUid,
+            @RequestHeader("X-User-Name") String username) {
+
+        if (username == null || username.trim().isEmpty()) {
+            return Mono.just(ResponseEntity.badRequest().build());
+        }
+
+        try {
+            Object ticket = gatewayService.getUserTicket(username, ticketUid);
+            return Mono.just(ResponseEntity.ok(ticket));
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(503).build());
+        }
+    }
+
+    // 购买票
+    @PostMapping("/tickets")
+    public Mono<ResponseEntity<?>> purchaseTicket(
+            @RequestHeader("X-User-Name") String username,
+            @RequestBody Object request) {
+
+        if (username == null || username.trim().isEmpty()) {
+            return Mono.just(ResponseEntity.badRequest().build());
+        }
+
+        try {
+            Object response = gatewayService.purchaseTicket(username, request);
+            return Mono.just(ResponseEntity.ok(response));
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(503).build());
+        }
+    }
+
+    // 退票 - 修复路径参数
+    @DeleteMapping("/tickets/{ticketUid}")
+    public Mono<ResponseEntity<Void>> returnTicket(
+            @PathVariable("ticketUid") String ticketUid,
+            @RequestHeader("X-User-Name") String username) {
+
+        if (username == null || username.trim().isEmpty()) {
+            return Mono.just(ResponseEntity.badRequest().build());
+        }
+
+        try {
+            boolean success = gatewayService.returnTicket(username, ticketUid);
+            if (success) {
+                return Mono.just(ResponseEntity.noContent().build());
+            } else {
+                return Mono.just(ResponseEntity.notFound().build());
+            }
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(503).build());
+        }
+    }
+
+    // 获取航班列表
     @GetMapping("/flights")
-    public ResponseEntity<Object> getFlights(
+    public Mono<ResponseEntity<?>> getFlights(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size) {
 
-        return flightService.getFlights(page, size);
+        try {
+            Object flights = gatewayService.getFlights(page, size);
+            return Mono.just(ResponseEntity.ok(flights));
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(503).build());
+        }
     }
 
     // 健康检查
     @GetMapping("/manage/health")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("OK");
-    }
-
-    // 测试服务状态
-    @GetMapping("/test")
-    public ResponseEntity<String> testServices() {
-        StringBuilder result = new StringBuilder("=== Service Status ===\n");
-
-        // 测试 Flight Service
-        try {
-            ResponseEntity<Object> flightResponse = flightService.getFlights(0, 1);
-            result.append("✓ Flight Service: UP\n");
-        } catch (Exception e) {
-            result.append("✗ Flight Service: DOWN - ").append(e.getMessage()).append("\n");
-        }
-
-        // 测试其他服务
-        result.append("✓ Gateway Service: UP\n");
-
-        return ResponseEntity.ok(result.toString());
+    public Mono<ResponseEntity<String>> healthCheck() {
+        return Mono.just(ResponseEntity.ok("OK"));
     }
 }

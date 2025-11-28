@@ -1,35 +1,20 @@
 package com.example.ticketservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 
 public class TicketResponse {
-    @JsonProperty("ticketUid")
     private UUID ticketUid;
-
-    @JsonProperty("flightNumber")
     private String flightNumber;
-
-    @JsonProperty("fromAirport")
     private String fromAirport;
-
-    @JsonProperty("toAirport")
     private String toAirport;
-
-    @JsonProperty("date")
     private String date;
-
-    @JsonProperty("price")
     private Integer price;
-
-    @JsonProperty("status")
     private String status;
 
-    // Constructors, Getters and Setters
     public TicketResponse() {}
 
-    public TicketResponse(UUID ticketUid, String flightNumber, String fromAirport, String toAirport,
-                          String date, Integer price, String status) {
+    public TicketResponse(UUID ticketUid, String flightNumber, String fromAirport,
+                          String toAirport, String date, Integer price, String status) {
         this.ticketUid = ticketUid;
         this.flightNumber = flightNumber;
         this.fromAirport = fromAirport;
@@ -39,6 +24,7 @@ public class TicketResponse {
         this.status = status;
     }
 
+    // Getters and Setters
     public UUID getTicketUid() { return ticketUid; }
     public void setTicketUid(UUID ticketUid) { this.ticketUid = ticketUid; }
 

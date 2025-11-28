@@ -344,7 +344,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/tickets/:ticketUid",
+              "raw": "{{baseUrl}}/api/v1/tickets/{{ticketUid}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -352,7 +352,7 @@
                 "api",
                 "v1",
                 "tickets",
-                ":ticketUid"
+                "{{ticketUid}}"
               ],
               "variable": [
                 {
@@ -376,7 +376,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/tickets/:ticketUid",
+                  "raw": "{{baseUrl}}/api/v1/tickets/{{ticketUid}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -384,7 +384,7 @@
                     "api",
                     "v1",
                     "tickets",
-                    ":ticketUid"
+                    "{{ticketUid}}"
                   ],
                   "variable": [
                     {
@@ -704,7 +704,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/tickets/:ticketUid",
+              "raw": "{{baseUrl}}/api/v1/tickets/{{ticketUid}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -712,7 +712,7 @@
                 "api",
                 "v1",
                 "tickets",
-                ":ticketUid"
+                "{{ticketUid}}"
               ],
               "variable": [
                 {
@@ -736,7 +736,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/tickets/:ticketUid",
+                  "raw": "{{baseUrl}}/api/v1/tickets/{{ticketUid}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -744,7 +744,7 @@
                     "api",
                     "v1",
                     "tickets",
-                    ":ticketUid"
+                    "{{ticketUid}}"
                   ],
                   "variable": [
                     {

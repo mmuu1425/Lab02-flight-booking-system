@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PrivilegeRepository extends JpaRepository<Privilege, Integer> {
+public interface PrivilegeRepository extends JpaRepository<Privilege, Integer> {  // 改为Integer
     Optional<Privilege> findByUsername(String username);
-    boolean existsByUsername(String username);
 }

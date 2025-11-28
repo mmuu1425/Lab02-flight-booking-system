@@ -20,7 +20,9 @@ services:
       retries: 5
 
   flight-service:
-    build: ./flight-service
+    build:
+      context: .  # 使用项目根目录
+      dockerfile: flight-service/Dockerfile
     container_name: flight-service
     restart: on-failure
     ports:
@@ -38,7 +40,9 @@ services:
       retries: 5
 
   ticket-service:
-    build: ./ticket-service
+    build:
+      context: .  # 使用项目根目录
+      dockerfile: ticket-service/Dockerfile
     container_name: ticket-service
     restart: on-failure
     ports:
@@ -46,17 +50,20 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ticket_db
+      SERVICE_BONUS_URL: http://bonus-service:8050  # 添加这行
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8070/manage/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8070/manage/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
   bonus-service:
-    build: ./bonus-service
+    build:
+      context: .  # 使用项目根目录
+      dockerfile: bonus-service/Dockerfile
     container_name: bonus-service
     restart: on-failure
     ports:
@@ -74,7 +81,9 @@ services:
       retries: 5
 
   gateway-service:
-    build: ./gateway-service
+    build:
+      context: .  # 使用项目根目录
+      dockerfile: gateway-service/Dockerfile
     container_name: gateway-service
     restart: on-failure
     ports:
